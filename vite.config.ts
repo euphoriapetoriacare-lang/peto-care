@@ -35,12 +35,12 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'https://yehia-ayman-peto-care-server.hf.space',
+        target: 'https://peto-care-orge-peto-care-server.hf.space',
         changeOrigin: true,
         secure: false,
       },
       '/uploads': {
-        target: 'https://yehia-ayman-peto-care-server.hf.space',
+        target: 'https://peto-care-orge-peto-care-server.hf.space',
         changeOrigin: true,
         secure: false,
       }
