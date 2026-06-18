@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { uploadAPI } from '@/services/api';
 import { toast } from 'sonner';
 import { Plus, Edit2, Trash2, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { getImageUrl } from '@/utils/imageHelper';
 
 interface Disease {
     _id: string;
@@ -175,7 +176,7 @@ export default function ManageDiseases() {
 
                                 <div className="relative h-48 overflow-hidden bg-neutral-100">
                                     <img 
-                                        src={disease.imageUrl || 'https://via.placeholder.com/800x600?text=No+Image'} 
+                                        src={getImageUrl(disease.imageUrl, 'https://via.placeholder.com/800x600?text=No+Image')}
                                         alt={disease.name} 
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                                     />

@@ -6,7 +6,10 @@ export const getImageUrl = (path: string | undefined | null, defaultImage: strin
     }
 
     // Remove duplicate slashes if any when combining
-    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:7860').replace(/\/$/, '')
+    let baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:7860').replace(/\/$/, '')
+    // Strip /api if present because uploads are served at the root level, not under /api
+    baseUrl = baseUrl.replace(/\/api$/, '')
+    
     const cleanPath = path.startsWith('/') ? path : `/${path}`
 
     return `${baseUrl}${cleanPath}`
