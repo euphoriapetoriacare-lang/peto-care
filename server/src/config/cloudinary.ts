@@ -8,23 +8,44 @@ cloudinary.config({
   api_secret: String(process.env.CLOUDINARY_API_SECRET)
 })
 
-const storage = new CloudinaryStorage({
+const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: () => ({
-    folder: 'vet-app-uploads',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    folder: 'vet-app/images',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic'],
     resource_type: 'image'
   } as any)
 }) as any
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const ok = ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)
-    if (!ok) return cb(null, false)
-    cb(null, true)
-  }
+const videoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: () => ({
+    folder: 'vet-app/videos',
+    allowed_formats: ['mp4', 'webm', 'mov'],
+    resource_type: 'video'
+  } as any)
+}) as any
+
+const docStorage = new CloudinaryStorage({
+  cloudinary,
+  params: () => ({
+    folder: 'vet-app/documents',
+    allowed_formats: ['pdf', 'jpg', 'jpeg', 'png'],
+    resource_type: 'auto'
+  } as any)
+}) as any
+
+export const uploadImageCloud = multer({
+  storage: imageStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 })
 
-export default upload
+export const uploadVideoCloud = multer({
+  storage: videoStorage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+})
+
+export const uploadDocCloud = multer({
+  storage: docStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+})

@@ -7,37 +7,9 @@ import { supabaseAdmin } from '../lib/supabase'
 
 const router = Router()
 
-const uploadDir = path.join(__dirname, '..', '..', 'uploads')
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true })
+import { uploadImageCloud, uploadVideoCloud, uploadDocCloud } from '../config/cloudinary'
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-})
-
-const imageFileFilter = (_req: any, file: any, cb: any) => {
-  const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
-  if (allowed.includes(file.mimetype) || file.originalname.match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/i)) cb(null, true)
-  else cb(new Error('invalid_image_type'))
-}
-
-const docFileFilter = (_req: any, file: any, cb: any) => {
-  const allowed = ['application/pdf', 'image/jpeg', 'image/png']
-  if (allowed.includes(file.mimetype)) cb(null, true)
-  else cb(new Error('invalid_document_type'))
-}
-
-const videoFileFilter = (_req: any, file: any, cb: any) => {
-  const allowed = ['video/mp4', 'video/webm']
-  if (allowed.includes(file.mimetype)) cb(null, true)
-  else cb(new Error('invalid_video_type'))
-}
-
-const uploadImageMw = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 }, fileFilter: imageFileFilter })
-const uploadDocMw = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 }, fileFilter: docFileFilter })
-const uploadVideoMw = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 }, fileFilter: videoFileFilter })
-
-router.post('/documents', requireAuth(['user', 'vet', 'admin']), uploadDocMw.single('file'), async (req, res) => {
+router.post('/documents', requireAuth(['user', 'vet', 'admin']), uploadDocCloud.single('file'), async (req, res) => {
   try {
     const file = (req as any).file
     const userId = (req as any).user.id
@@ -59,7 +31,7 @@ router.post('/documents', requireAuth(['user', 'vet', 'admin']), uploadDocMw.sin
 
     if (error) return res.status(500).json({ error: 'save_failed', message: error.message })
 
-    res.json({ file: newFile, url: `/uploads/${file.filename}` })
+    res.json({ file: newFile, url: file.path })
   } catch (error) {
     console.error('Error uploading document:', error)
     res.status(500).json({ error: 'server_error' })
@@ -67,7 +39,7 @@ router.post('/documents', requireAuth(['user', 'vet', 'admin']), uploadDocMw.sin
 })
 
 router.post('/images', requireAuth(['user', 'vet', 'petstore', 'admin']), (req, res, next) => {
-  uploadImageMw.single('file')(req, res, (err) => {
+  uploadImageCloud.single('file')(req, res, (err) => {
     if (err) {
       console.error('Multer error:', err)
       if (err.message === 'invalid_image_type') {
@@ -89,10 +61,10 @@ router.post('/images', requireAuth(['user', 'vet', 'petstore', 'admin']), (req, 
     })
   }
 
-  res.json({ filename: file.filename, path: file.path, url: `/uploads/${file.filename}` })
+  res.json({ filename: file.filename || file.originalname, path: file.path, url: file.path })
 })
 
-router.post('/videos', requireAuth(['vet']), uploadVideoMw.single('file'), async (req, res) => {
+router.post('/videos', requireAuth(['vet']), uploadVideoCloud.single('file'), async (req, res) => {
   try {
     const file = (req as any).file
     const userId = (req as any).user.id
@@ -114,7 +86,7 @@ router.post('/videos', requireAuth(['vet']), uploadVideoMw.single('file'), async
 
     if (error) return res.status(500).json({ error: 'save_failed', message: error.message })
 
-    res.json({ filename: file.filename, path: file.path, url: `/uploads/${file.filename}`, file: newFile })
+    res.json({ filename: file.filename || file.originalname, path: file.path, url: file.path, file: newFile })
   } catch (error) {
     console.error('Error uploading video:', error)
     res.status(500).json({ error: 'server_error' })
