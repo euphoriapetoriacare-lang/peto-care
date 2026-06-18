@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import api, { notificationsAPI } from '@/services/api';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/utils/imageHelper';
 
 type Pet = {
   _id: string;
@@ -122,13 +123,13 @@ const NoPets = () => {
         {/* Blurred background fill for any image shape */}
         <img
           alt=""
-          src={pet.imageUrl || 'https://via.placeholder.com/800x600?text=No+Image'}
+          src={getImageUrl(pet.imageUrl) || 'https://via.placeholder.com/800x600?text=No+Image'}
           className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 opacity-60"
           aria-hidden="true"
         />
         {/* Main sharp image, centered */}
         <img
-          src={pet.imageUrl || 'https://via.placeholder.com/800x600?text=No+Image'}
+          src={getImageUrl(pet.imageUrl) || 'https://via.placeholder.com/800x600?text=No+Image'}
           alt={pet.title}
           className="relative z-10 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           onError={handleImageError}
@@ -163,7 +164,7 @@ const NoPets = () => {
         </p>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {pet.personality && pet.personality.slice(0, 3).map((trait, idx) => (
+          {pet.personality && pet.personality.length > 0 && pet.personality.slice(0, 3).map((trait, idx) => (
             <span
               key={idx}
               className="px-2.5 py-1 bg-blue-50 text-[var(--color-vet-primary)] text-xs font-medium rounded-lg border border-blue-100"
@@ -533,7 +534,7 @@ const NoPets = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="h-64 md:h-full">
                   <img
-                    src={selectedPet.imageUrl}
+                    src={getImageUrl(selectedPet.imageUrl) || 'https://via.placeholder.com/800x600?text=No+Image'}
                     alt={selectedPet.title}
                     className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
                     onError={handleImageError}
@@ -561,21 +562,24 @@ const NoPets = () => {
 
                   <div className="space-y-6">
                     {/* Personality */}
+                    {selectedPet.personality && selectedPet.personality.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
                         <UserCheck className="w-5 h-5 ml-2 text-[var(--color-vet-primary)]" />
                         {t('labels.personality')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {selectedPet.personality && selectedPet.personality.map((trait, idx) => (
+                        {selectedPet.personality.map((trait, idx) => (
                           <span key={idx} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
                             {trait}
                           </span>
                         ))}
                       </div>
                     </div>
+                    )}
 
                     {/* Care Tips */}
+                    {selectedPet.careTips && selectedPet.careTips.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
                         <CheckCircle className="w-5 h-5 ml-2 text-[var(--color-vet-secondary)]" />
@@ -590,8 +594,10 @@ const NoPets = () => {
                         ))}
                       </ul>
                     </div>
+                    )}
 
                     {/* Ideal Owner */}
+                    {selectedPet.idealOwner && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
                         <UserCheck className="w-5 h-5 ml-2 text-purple-600" />
@@ -599,8 +605,10 @@ const NoPets = () => {
                       </h3>
                       <p className="text-gray-700">{selectedPet.idealOwner}</p>
                     </div>
+                    )}
 
                     {/* Funny Tip */}
+                    {selectedPet.tip && (
                     <div className="bg-amber-50 border-r-4 border-[var(--color-vet-accent)] p-4 rounded">
                       <h3 className="text-lg font-semibold text-amber-800 mb-1 flex items-center">
                         <Star className="w-5 h-5 ml-2 text-[var(--color-vet-accent)]" />
@@ -608,15 +616,17 @@ const NoPets = () => {
                       </h3>
                       <p className="text-[var(--color-vet-accent)]">{selectedPet.tip}</p>
                     </div>
+                    )}
 
                     {/* Supplies */}
+                    {selectedPet.supplies && selectedPet.supplies.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
                         <ShoppingBag className="w-5 h-5 ml-2 text-[var(--color-vet-primary)]" />
                         {t('supplies.essentials')}
                       </h3>
                       <div className="grid grid-cols-2 gap-2">
-                        {selectedPet.supplies && selectedPet.supplies.map((item, idx) => (
+                        {selectedPet.supplies.map((item, idx) => (
                           <div key={idx} className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
                             <Package className="w-4 h-4 text-[var(--color-vet-primary)] ml-2" />
                             <span className="text-gray-700 text-sm">{item}</span>
@@ -624,6 +634,7 @@ const NoPets = () => {
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
