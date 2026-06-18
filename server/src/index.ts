@@ -77,10 +77,12 @@ app.set('trust proxy', 1); // Trust the HF reverse proxy for rate limiting
 const server = http.createServer(app);
 const allowedOrigins = process.env.CORS_ORIGIN?.split(',') ?? ['*']
 const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow all origins — auth is JWT-based (stateless), CORS doesn't add security here
-    return callback(null, true);
-  },
+  origin: [
+    'http://localhost:5173',
+    'https://peto-care.pages.dev',
+    // Allow any Cloudflare preview branches just in case
+    /^https:\/\/.*\.peto-care\.pages\.dev$/
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
