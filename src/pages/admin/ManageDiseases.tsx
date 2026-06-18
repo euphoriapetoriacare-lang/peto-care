@@ -86,9 +86,9 @@ export default function ManageDiseases() {
             }
             fetchDiseases();
             closeModal();
-        } catch (error) {
-            console.error('Submission error:', error);
-            toast.error('حدث خطأ أثناء حفظ البيانات');
+        } catch (error: any) {
+            console.error('Submission error details:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'حدث خطأ أثناء حفظ البيانات');
         } finally {
             setIsSubmitting(false);
         }
@@ -101,9 +101,9 @@ export default function ManageDiseases() {
             await api.delete(`/diseases/${id}`);
             toast.success('تم الحذف بنجاح');
             setDiseases(diseases.filter(d => d._id !== id));
-        } catch (error) {
-            console.error('Delete error:', error);
-            toast.error('حدث خطأ أثناء الحذف');
+        } catch (error: any) {
+            console.error('Delete error details:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'حدث خطأ أثناء الحذف');
         }
     };
 

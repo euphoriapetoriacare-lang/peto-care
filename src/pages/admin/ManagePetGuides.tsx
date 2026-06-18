@@ -83,9 +83,9 @@ export default function ManagePetGuides() {
             }
             fetchGuides();
             closeModal();
-        } catch (error) {
-            console.error('Submission error:', error);
-            toast.error('حدث خطأ أثناء حفظ البيانات');
+        } catch (error: any) {
+            console.error('Submission error details:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'حدث خطأ أثناء حفظ البيانات');
         } finally {
             setIsSubmitting(false);
         }
@@ -98,9 +98,9 @@ export default function ManagePetGuides() {
             await api.delete(`/pet-guides/${id}`);
             toast.success('تم الحذف بنجاح');
             setGuides(guides.filter(g => g._id !== id));
-        } catch (error) {
-            console.error('Delete error:', error);
-            toast.error('حدث خطأ أثناء الحذف');
+        } catch (error: any) {
+            console.error('Delete error details:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'حدث خطأ أثناء الحذف');
         }
     };
 
